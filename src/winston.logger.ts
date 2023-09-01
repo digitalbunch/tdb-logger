@@ -1,4 +1,3 @@
-import type { LoggerService } from '@nestjs/common';
 import { createLogger, format, Logger, transports as transport } from 'winston';
 
 import developmentConsoleFormat from './development.format';
@@ -12,7 +11,7 @@ function isAxiosError(payload: any) {
 }
 
 // @Injectable()
-export class WinstonLogger implements LoggerService {
+export class WinstonLogger {
   private readonly logger: Logger;
 
   public constructor(private readonly development: boolean = false) {
@@ -108,12 +107,12 @@ export class WinstonLogger implements LoggerService {
     });
   }
 
-  public debug?(message: any, context?: string): Logger {
+  public debug(message: any, context?: string): Logger {
     const requestMeta = getRequestContext();
 
     if (typeof message === 'object') {
       const { message: unpackedMessage, ...meta } = message;
-      return this.logger.debug(unpackedMessage as string, {
+      return this.logger.debug(unpackedMessage, {
         context,
         ...meta,
         ...requestMeta,
@@ -126,7 +125,7 @@ export class WinstonLogger implements LoggerService {
     });
   }
 
-  public verbose?(message: any, context?: string): Logger {
+  public verbose(message: any, context?: string): Logger {
     const requestMeta = getRequestContext();
 
     if (typeof message === 'object') {
