@@ -10,7 +10,6 @@ function isAxiosError(payload: any) {
   return isObject(payload) && payload.isAxiosError === true;
 }
 
-// @Injectable()
 export class WinstonLogger {
   private readonly logger: Logger;
 

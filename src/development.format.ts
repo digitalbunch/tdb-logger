@@ -1,9 +1,10 @@
-import * as clc from 'cli-color';
+import clc from 'cli-color';
+import type bare from 'cli-color/bare';
 import { Format } from 'logform';
 import { inspect } from 'util';
 import { format } from 'winston';
 
-const devColorScheme = {
+const devColorScheme: Record<string, bare.Format> = {
   info: clc.greenBright,
   error: clc.red,
   warn: clc.yellow,
@@ -19,8 +20,7 @@ const developmentConsoleFormat = (): Format =>
       .replace('T', ' ')
       .replace(/-/g, '/');
 
-    const color =
-      devColorScheme[level as 'info' | 'error' | 'warn' | 'debug' | 'verbose'];
+    const color = devColorScheme[level];
     const stringifyMeta = JSON.stringify(meta);
     const formattedMeta = inspect(JSON.parse(stringifyMeta), {
       colors: true,
