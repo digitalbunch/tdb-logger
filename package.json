@@ -1,0 +1,40 @@
+{
+  "name": "tdb-logger",
+  "version": "1.0.0",
+  "description": "TDB Logger",
+  "main": "lib/index.js",
+  "types": "lib",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p .",
+    "build:old": "rm -rf dist/ && prettier --write src/ && npm run build:esm && npm run build:cjs",
+    "build:esm": "tsc",
+    "build:cjs": "tsc --module CommonJS --outDir dist/cjs"
+  },
+  "keywords": [
+    "logger"
+  ],
+  "author": "The Digital Bunch",
+  "license": "ISC",
+  "devDependencies": {
+    "@nestjs/common": "^10.2.4",
+    "@types/cli-color": "^2.0.2",
+    "@types/node": "^20.5.7",
+    "@typescript-eslint/eslint-plugin": "^6.5.0",
+    "@typescript-eslint/parser": "^6.5.0",
+    "eslint": "^8.48.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-prettier": "^5.0.0",
+    "eslint-plugin-simple-import-sort": "^10.0.0",
+    "prettier": "^3.0.3",
+    "ts-node": "^10.9.1",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^5.2.2"
+  },
+  "dependencies": {
+    "cli-color": "^2.0.3",
+    "winston": "^3.10.0"
+  }
+}
