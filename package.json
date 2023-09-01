@@ -21,7 +21,9 @@
   "devDependencies": {
     "@nestjs/common": "^10.2.4",
     "@types/cli-color": "^2.0.2",
+    "@types/express": "^4.17.17",
     "@types/node": "^20.5.7",
+    "@types/uuid": "^9.0.3",
     "@typescript-eslint/eslint-plugin": "^6.5.0",
     "@typescript-eslint/parser": "^6.5.0",
     "eslint": "^8.48.0",
@@ -30,11 +32,11 @@
     "eslint-plugin-simple-import-sort": "^10.0.0",
     "prettier": "^3.0.3",
     "ts-node": "^10.9.1",
-    "tsconfig-paths": "^4.2.0",
     "typescript": "^5.2.2"
   },
   "dependencies": {
     "cli-color": "^2.0.3",
+    "uuid": "^9.0.0",
     "winston": "^3.10.0"
   }
 }

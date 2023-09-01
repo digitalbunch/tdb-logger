@@ -1,8 +1,6 @@
-// Temporary solution
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-nocheck
 import { AsyncLocalStorage, AsyncResource } from 'async_hooks';
-import { v4 as uuidV4 } from 'uuid';
+import type { Request, Response } from 'express';
+import { v4 as uuidV4, V4Options } from 'uuid';
 
 const als = new AsyncLocalStorage();
 
@@ -36,12 +34,12 @@ export const tracerMiddleware = ({
   requestIdFactory = uuidV4,
   echoHeader = false,
 } = {}) => {
-  return (req: any, res: any, next: any) => {
-    let requestId: string | undefined = undefined;
+  return (req: Request, res: Response, next: any) => {
+    let requestId: string | undefined;
     if (useHeader) {
-      requestId = req.headers[headerName.toLowerCase()];
+      requestId = req.header(headerName);
     }
-    requestId = requestId || requestIdFactory(req);
+    requestId ||= requestIdFactory(req as V4Options);
 
     if (echoHeader) {
       res.set(headerName, requestId);
@@ -60,13 +58,13 @@ const removeMethods = ['off', 'removeListener'];
 const isWrappedSymbol = Symbol('tracer-is-wrapped');
 const wrappedSymbol = Symbol('tracer-wrapped-function');
 
-const wrapHttpEmitters = (req: any, res: any) => {
+const wrapHttpEmitters = (req: Request, res: Response) => {
   const asyncResource = new AsyncResource('request-tracer');
   wrapEmitter(req, asyncResource);
   wrapEmitter(res, asyncResource);
 };
 
-function wrapEmitterMethod(emitter: any, method: any, wrapper: any) {
+function wrapEmitterMethod(emitter: any, method: string, wrapper: any) {
   if (emitter[method][isWrappedSymbol]) {
     return;
   }
@@ -79,13 +77,17 @@ function wrapEmitterMethod(emitter: any, method: any, wrapper: any) {
   return wrapped;
 }
 
-function wrapEmitter(emitter, asyncResource) {
+function wrapEmitter(emitter: any, asyncResource: AsyncResource) {
   for (const method of addMethods) {
     wrapEmitterMethod(
       emitter,
       method,
-      (original) =>
-        function (event, handler) {
+      (original: (event: string, handler: any) => any) =>
+        function (
+          this: (event: string, handler: any) => any,
+          event: string,
+          handler: any,
+        ) {
           let wrapped = emitter[wrappedSymbol];
           if (wrapped === undefined) {
             wrapped = {};
@@ -113,8 +115,12 @@ function wrapEmitter(emitter, asyncResource) {
     wrapEmitterMethod(
       emitter,
       method,
-      (original) =>
-        function (event, handler) {
+      (original: (event: string, handler: any) => any) =>
+        function (
+          this: (event: string, handler: any) => any,
+          event: string,
+          handler: any,
+        ) {
           let wrappedHandler;
           const wrapped = emitter[wrappedSymbol];
           if (wrapped !== undefined) {

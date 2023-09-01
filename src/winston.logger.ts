@@ -1,4 +1,4 @@
-import { LoggerService } from '@nestjs/common';
+import type { LoggerService } from '@nestjs/common';
 import { createLogger, format, Logger, transports as transport } from 'winston';
 
 import developmentConsoleFormat from './development.format';
