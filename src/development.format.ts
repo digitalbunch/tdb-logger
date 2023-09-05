@@ -1,6 +1,6 @@
 import clc from 'cli-color';
 import type bare from 'cli-color/bare';
-import { Format } from 'logform';
+import type { Format } from 'logform';
 import { inspect } from 'util';
 import { format } from 'winston';
 

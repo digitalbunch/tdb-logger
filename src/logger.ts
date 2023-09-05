@@ -21,6 +21,7 @@ export class Logger {
   }
 
   public warn(message: string, meta?: unknown, context?: string): void;
+  public warn(message: string, error: Error, context?: string): void;
   public warn(message: any, meta: any = {}, context?: string): any {
     return this.getInstance.warn({ message, meta }, context || this.context);
   }
@@ -40,37 +41,16 @@ export class Logger {
     return this.getInstance.verbose({ message, meta }, context || this.context);
   }
 
-  // public static initializeLogger(app: INestApplication): void {
-  //   app.useLogger(this.loggerInstance);
-  //   app.use(
-  //     tracerMiddleware({
-  //       useHeader: true,
-  //       headerName: 'X-Request-Id-Header',
-  //     }),
-  //   );
-  //
+  // public static initializeLogger(): void {
   //   const logger: Logger = new Logger('Global');
   //   // Catch unhandled promise rejections and log them in 'Global' context as errors
   //   process.on('unhandledRejection', (error: Error) => {
-  //     logger.error('Unhandled promise rejection caught', error);
+  //     logger.error('Unhandled promise rejection caught:', error);
   //   });
   //
   //   // Catch uncaught exceptions and log them in 'Global' context as errors
   //   process.on('uncaughtException', (error: Error) => {
-  //     logger.error('Unhandled exception caught', error);
+  //     logger.error('Unhandled exception caught:', error);
   //   });
   // }
-
-  public static initializeLogger(): void {
-    const logger: Logger = new Logger('Global');
-    // Catch unhandled promise rejections and log them in 'Global' context as errors
-    process.on('unhandledRejection', (error: Error) => {
-      logger.error('Unhandled promise rejection caught', error);
-    });
-
-    // Catch uncaught exceptions and log them in 'Global' context as errors
-    process.on('uncaughtException', (error: Error) => {
-      logger.error('Unhandled exception caught', error);
-    });
-  }
 }

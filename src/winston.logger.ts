@@ -1,10 +1,11 @@
+import type { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import { createLogger, format, Logger, transports as transport } from 'winston';
 
 import developmentConsoleFormat from './development.format';
 import { getRequestContext } from './local-storage.middleware';
 
 // copied from axios
-function isAxiosError(payload: any) {
+function isAxiosError(payload: any): payload is AxiosError {
   const isObject = (thing: unknown) =>
     thing !== null && typeof thing === 'object';
   return isObject(payload) && payload.isAxiosError === true;
@@ -24,9 +25,9 @@ export class WinstonLogger {
     const requestMeta = getRequestContext();
     const { error, message }: { error: any; message: string } = payload;
 
-    if (typeof error === 'object' && isAxiosError(error)) {
+    if (isAxiosError(error)) {
       const { stack, code } = error;
-      const request = error.config;
+      const request = error.config as InternalAxiosRequestConfig;
 
       return this.logger.error(message, {
         context,
@@ -75,6 +76,15 @@ export class WinstonLogger {
 
     if (typeof message === 'object') {
       const { message: unpackedMessage, meta } = message;
+      if (meta instanceof Error) {
+        return this.logger.warn(unpackedMessage, {
+          context,
+          ...meta,
+          ...requestMeta,
+          stack: meta.stack,
+        });
+      }
+
       return this.logger.warn(unpackedMessage, {
         context,
         ...meta,
