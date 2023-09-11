@@ -1,7 +1,13 @@
 import type { AxiosError, InternalAxiosRequestConfig } from 'axios';
-import { createLogger, format, Logger, transports as transport } from 'winston';
+import {
+  createLogger,
+  format,
+  Logger,
+  LoggerOptions,
+  transports as transport,
+} from 'winston';
 
-import developmentConsoleFormat from './development.format';
+import { developmentConsoleColorFormat } from './development.format';
 import { getRequestContext } from './local-storage.middleware';
 
 // copied from axios
@@ -14,10 +20,14 @@ function isAxiosError(payload: any): payload is AxiosError {
 export class WinstonLogger {
   private readonly logger: Logger;
 
-  public constructor(private readonly development: boolean = false) {
+  public constructor(
+    private readonly development: boolean = false,
+    options?: LoggerOptions,
+  ) {
     this.logger = createLogger({
-      format: development ? developmentConsoleFormat() : format.simple(),
+      format: development ? developmentConsoleColorFormat() : format.simple(),
       transports: [new transport.Console()],
+      ...options,
     });
   }
 

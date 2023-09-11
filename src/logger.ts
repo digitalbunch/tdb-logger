@@ -1,14 +1,22 @@
 import process from 'process';
+import { LoggerOptions } from 'winston';
 
 import { WinstonLogger } from './winston.logger';
 
 export class Logger {
-  private static readonly loggerInstance = new WinstonLogger(
+  private static loggerInstance = new WinstonLogger(
     process.env.LOGGER === 'dev',
   );
 
   constructor(context: string);
   constructor(protected context: string) {}
+
+  static setOptions(options: LoggerOptions) {
+    this.loggerInstance = new WinstonLogger(
+      process.env.LOGGER === 'dev',
+      options,
+    );
+  }
 
   protected get getInstance() {
     return Logger.loggerInstance;

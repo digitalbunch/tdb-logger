@@ -12,13 +12,12 @@ const devColorScheme: Record<string, bare.Format> = {
   verbose: clc.cyanBright,
 };
 
-const developmentConsoleFormat = (): Format =>
+const getFormattedDate = () =>
+  new Date().toISOString().split('.')[0].replace('T', ' ').replace(/-/g, '/');
+
+const developmentConsoleColorFormat = (): Format =>
   format.printf(({ context, level, timestamp, message, ms, ...meta }) => {
-    timestamp = new Date()
-      .toISOString()
-      .split('.')[0]
-      .replace('T', ' ')
-      .replace(/-/g, '/');
+    timestamp = getFormattedDate();
 
     const color = devColorScheme[level];
     const stringifyMeta = JSON.stringify(meta);
@@ -39,4 +38,23 @@ const developmentConsoleFormat = (): Format =>
     );
   });
 
-export default developmentConsoleFormat;
+const developmentConsoleFormat = (): Format =>
+  format.printf(({ context, level, timestamp, message, ms, ...meta }) => {
+    timestamp = getFormattedDate();
+
+    const stringifyMeta = JSON.stringify(meta);
+    const formattedMeta = inspect(JSON.parse(stringifyMeta), {
+      depth: null,
+    });
+
+    return (
+      `${timestamp} ` +
+      `${level.toUpperCase()} ` +
+      (typeof context !== 'undefined' ? `${'[' + context + ']'} ` : '') +
+      `${message}` +
+      (stringifyMeta === '{}' ? '' : ` ${formattedMeta}`) +
+      (typeof ms !== 'undefined' ? ` ${ms}` : '')
+    );
+  });
+
+export { developmentConsoleColorFormat, developmentConsoleFormat };
