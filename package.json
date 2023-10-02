@@ -1,7 +1,7 @@
 {
   "name": "@thedigitalbunch/logger",
   "private": false,
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "TDB Logger",
   "main": "lib/index.js",
   "types": "lib",
@@ -9,6 +9,10 @@
     "build": "tsc -p ."
   },
   "repository": "https://github.com/digitalbunch/tdb-logger.git",
+  "files": [
+    "README.md",
+    "lib"
+  ],
   "keywords": [
     "logger"
   ],
