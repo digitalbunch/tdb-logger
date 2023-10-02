@@ -15,7 +15,7 @@ import { Logger } from '@thedigitalbunch/logger';
 ```js
 const logger = new Logger('TestService');
 
-logger.info('Hello World!');
+logger.log('Hello World!');
 ```
 
 You can also change the logger options, including the format:
