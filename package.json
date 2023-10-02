@@ -1,5 +1,6 @@
 {
   "name": "@thedigitalbunch/logger",
+  "private": false,
   "version": "1.0.0",
   "description": "TDB Logger",
   "main": "lib/index.js",
