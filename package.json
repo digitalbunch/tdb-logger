@@ -1,17 +1,17 @@
 {
   "name": "@thedigitalbunch/logger",
   "private": false,
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "TDB Logger",
-  "main": "lib/index.js",
-  "types": "lib",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc -p ."
+    "build": "tsc"
   },
   "repository": "https://github.com/digitalbunch/tdb-logger.git",
   "files": [
     "README.md",
-    "lib"
+    "dist"
   ],
   "keywords": [
     "logger"
@@ -35,6 +35,7 @@
     "typescript": "^5.2.2"
   },
   "dependencies": {
+    "@sentry/node": "^7.75.1",
     "cli-color": "^2.0.3",
     "uuid": "^9.0.0",
     "winston": "^3.10.0"
