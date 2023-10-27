@@ -17,6 +17,8 @@ function isAxiosError(payload: any): payload is AxiosError {
   return isObject(payload) && payload.isAxiosError === true;
 }
 
+export const consoleTransport = transport.Console;
+
 export class WinstonLogger {
   private readonly logger: Logger;
 
