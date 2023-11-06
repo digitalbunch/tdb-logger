@@ -3,6 +3,7 @@ import type { SeverityLevel } from '@sentry/types/types/severity';
 import process from 'process';
 import { LoggerOptions } from 'winston';
 
+import { getRequestContext } from './local-storage.middleware';
 import { WinstonLogger } from './winston.logger';
 
 export class Logger {
@@ -22,6 +23,12 @@ export class Logger {
   }
 
   static useSentry({ levels = ['error'] as SeverityLevel[] } = {}) {
+    try {
+      require.resolve('@sentry/node');
+    } catch (err: unknown) {
+      throw new Error('Could not find Sentry instance!');
+    }
+
     this.sentryLevels = levels;
   }
 
@@ -29,13 +36,33 @@ export class Logger {
     return Logger.loggerInstance;
   }
 
+  private handleSentry(data: any, level: Sentry.SeverityLevel, context: any) {
+    const { user, ...otherContext } = getRequestContext();
+
+    if (['fatal', 'error', 'warning'].includes(level)) {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      Sentry.captureException(data, {
+        level,
+        contexts: { ...context, ...otherContext },
+        user,
+      });
+    } else {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      Sentry.captureMessage(data, {
+        level,
+        contexts: { ...context, ...otherContext },
+        user,
+      });
+    }
+  }
+
   public error(message: string, error: Error, context?: string): void;
   public error(message: string, meta?: unknown, context?: string): void;
   public error(message: any, error: any = {}, context?: string): any {
     if (Logger.sentryLevels.includes('error')) {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      Sentry.captureException(error, { level: 'error', contexts: context });
+      this.handleSentry(error, 'error', context);
     }
     return this.getInstance.error({ error, message }, context || this.context);
   }
@@ -44,9 +71,7 @@ export class Logger {
   public warn(message: string, error: Error, context?: string): void;
   public warn(message: any, meta: any = {}, context?: string): any {
     if (Logger.sentryLevels.includes('warning')) {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      Sentry.captureException(error, { level: 'warning', contexts: context });
+      this.handleSentry(message, 'warning', context);
     }
     return this.getInstance.warn({ message, meta }, context || this.context);
   }
@@ -54,9 +79,7 @@ export class Logger {
   public log(message: string, meta?: unknown, context?: string): void;
   public log(message: any, meta: any = {}, context?: string): any {
     if (Logger.sentryLevels.includes('log')) {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      Sentry.captureMessage(message, { level: 'log', contexts: context });
+      this.handleSentry(message, 'log', context);
     }
     return this.getInstance.log({ message, meta }, context || this.context);
   }
@@ -64,9 +87,7 @@ export class Logger {
   public debug(message: string, meta?: unknown, context?: string): void;
   public debug(message: any, meta: any = {}, context?: string): any {
     if (Logger.sentryLevels.includes('debug')) {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      Sentry.captureMessage(message, { level: 'debug', contexts: context });
+      this.handleSentry(message, 'debug', context);
     }
     return this.getInstance.debug({ message, meta }, context || this.context);
   }
@@ -74,9 +95,7 @@ export class Logger {
   public verbose(message: string, meta?: unknown, context?: string): void;
   public verbose(message: any, meta: any = {}, context?: string): any {
     if (Logger.sentryLevels.includes('info')) {
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      Sentry.captureMessage(error, { level: 'info', contexts: context });
+      this.handleSentry(message, 'info', context);
     }
     return this.getInstance.verbose({ message, meta }, context || this.context);
   }

@@ -17,6 +17,13 @@ function isAxiosError(payload: any): payload is AxiosError {
   return isObject(payload) && payload.isAxiosError === true;
 }
 
+function getLoggerRequestContext() {
+  const { user, ...requestMeta } = getRequestContext();
+  const userId = (user as any)?.id;
+  const userData = userId ? { userId } : {};
+  return { ...requestMeta, ...userData };
+}
+
 export const consoleTransport = transport.Console;
 
 export class WinstonLogger {
@@ -34,7 +41,7 @@ export class WinstonLogger {
   }
 
   public error(payload: any, context?: string): Logger {
-    const requestMeta = getRequestContext();
+    const requestMeta = getLoggerRequestContext();
     const { error, message }: { error: any; message: string } = payload;
 
     if (isAxiosError(error)) {
@@ -84,7 +91,7 @@ export class WinstonLogger {
   }
 
   public warn(message: any, context?: string): Logger {
-    const requestMeta = getRequestContext();
+    const requestMeta = getLoggerRequestContext();
 
     if (typeof message === 'object') {
       const { message: unpackedMessage, meta } = message;
@@ -111,7 +118,7 @@ export class WinstonLogger {
   }
 
   public log(message: any, context?: string): Logger {
-    const requestMeta = getRequestContext();
+    const requestMeta = getLoggerRequestContext();
 
     if (typeof message === 'object') {
       const { message: unpackedMessage, meta } = message;
@@ -129,7 +136,7 @@ export class WinstonLogger {
   }
 
   public debug(message: any, context?: string): Logger {
-    const requestMeta = getRequestContext();
+    const requestMeta = getLoggerRequestContext();
 
     if (typeof message === 'object') {
       const { message: unpackedMessage, ...meta } = message;
@@ -147,7 +154,7 @@ export class WinstonLogger {
   }
 
   public verbose(message: any, context?: string): Logger {
-    const requestMeta = getRequestContext();
+    const requestMeta = getLoggerRequestContext();
 
     if (typeof message === 'object') {
       const { message: unpackedMessage, ...meta } = message;

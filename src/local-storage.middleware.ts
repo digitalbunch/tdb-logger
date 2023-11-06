@@ -6,6 +6,7 @@ const als = new AsyncLocalStorage();
 
 export interface RequestContext {
   readonly requestId?: string;
+  readonly user?: any;
   readonly [other: string | number | symbol]: unknown;
 }
 
@@ -20,6 +21,7 @@ export const getRequestContext = (): RequestContext => {
 
   return store;
 };
+
 export const pushRequestContext = (key: string, value: unknown): void => {
   const context = getRequestContext();
 
@@ -28,13 +30,17 @@ export const pushRequestContext = (key: string, value: unknown): void => {
   }
 };
 
+export const pushUserToRequestContext = (user: unknown): void => {
+  return pushRequestContext('user', user);
+};
+
 export const tracerMiddleware = ({
   useHeader = false,
   headerName = 'X-Request-Id',
   requestIdFactory = uuidV4,
   echoHeader = false,
 } = {}) => {
-  return (req: Request, res: Response, next: any) => {
+  return (req: Request & { user?: unknown }, res: Response, next: any) => {
     let requestId: string | undefined;
     if (useHeader) {
       requestId = req.header(headerName);
@@ -45,7 +51,7 @@ export const tracerMiddleware = ({
       res.set(headerName, requestId);
     }
 
-    als.run({ requestId }, () => {
+    als.run({ requestId, user: req.user }, () => {
       wrapHttpEmitters(req, res);
       next();
     });
