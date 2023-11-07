@@ -7,6 +7,7 @@ const als = new AsyncLocalStorage();
 export interface RequestContext {
   readonly requestId?: string;
   readonly user?: any;
+  readonly request?: ReturnType<typeof parseRequestObject>;
   readonly [other: string | number | symbol]: unknown;
 }
 
@@ -51,10 +52,30 @@ export const tracerMiddleware = ({
       res.set(headerName, requestId);
     }
 
-    als.run({ requestId, user: req.user }, () => {
+    const parsedRequest = parseRequestObject(req);
+
+    als.run({ requestId, request: parsedRequest, user: req.user }, () => {
       wrapHttpEmitters(req, res);
       next();
     });
+  };
+};
+
+const parseRequestObject = (req: Request) => {
+  return {
+    url: req.url,
+    baseUrl: req.baseUrl,
+    originalUrl: req.originalUrl,
+    hostname: req.hostname,
+    accepted: req.accepted,
+    params: req.params,
+    protocol: req.protocol,
+    query: req.query,
+    cookies: req.cookies,
+    signedCookies: req.signedCookies,
+    method: req.method,
+    body: req.body,
+    ip: req.ip,
   };
 };
 

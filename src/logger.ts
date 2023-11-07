@@ -1,4 +1,5 @@
 import type * as Sentry from '@sentry/node';
+import type { CaptureContext } from '@sentry/types/types/scope';
 import type { SeverityLevel } from '@sentry/types/types/severity';
 import process from 'process';
 import { LoggerOptions } from 'winston';
@@ -37,24 +38,22 @@ export class Logger {
   }
 
   private handleSentry(data: any, level: Sentry.SeverityLevel, context: any) {
-    const { user, ...otherContext } = getRequestContext();
+    const { user, request, ...otherContext } = getRequestContext();
 
+    const captureContext: CaptureContext = {
+      level,
+      extra: request,
+      contexts: { ...context, ...otherContext },
+      user,
+    };
     if (['fatal', 'error', 'warning'].includes(level)) {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      Sentry.captureException(data, {
-        level,
-        contexts: { ...context, ...otherContext },
-        user,
-      });
+      Sentry.captureException(data, captureContext);
     } else {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      Sentry.captureMessage(data, {
-        level,
-        contexts: { ...context, ...otherContext },
-        user,
-      });
+      Sentry.captureMessage(data, captureContext);
     }
   }
 

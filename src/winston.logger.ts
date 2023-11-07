@@ -18,7 +18,7 @@ function isAxiosError(payload: any): payload is AxiosError {
 }
 
 function getLoggerRequestContext() {
-  const { user, ...requestMeta } = getRequestContext();
+  const { user, request: _, ...requestMeta } = getRequestContext();
   const userId = (user as any)?.id;
   const userData = userId ? { userId } : {};
   return { ...requestMeta, ...userData };
